@@ -31,11 +31,11 @@ public struct SwiftyVideoView: View {
 
     public var body: some View {
 		VideoWrapper(player: player, gravity: aspectRatio)
-			.onTapGesture(perform: {
-				singleTapAction(player)
-			})
 			.onTapGesture(count: 2, perform: {
 				doubleTapAction(player)
+			})
+			.onTapGesture(perform: {
+				singleTapAction(player)
 			})
 	}
 }
@@ -44,10 +44,13 @@ struct SwiftyVideoView_Previews: PreviewProvider {
     static var previews: some View {
 		let player = AVPlayer(url: URL(fileURLWithPath: "/Users/mredig/Downloads/VID_20200603_103616.mp4"))
 		SwiftyVideoView(player: player, singleTapAction: { player in
-			player.timeControlStatus == .paused ? player.play() : player.pause()
+			player.isPlaying ? player.pause() : player.play()
 		}, doubleTapAction: { player in
 			print("double tapped")
 		})
 		.ignoresSafeArea()
+		.onAppear(perform: {
+			player.play()
+		})
     }
 }
