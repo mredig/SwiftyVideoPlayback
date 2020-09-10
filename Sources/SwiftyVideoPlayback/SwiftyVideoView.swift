@@ -9,21 +9,23 @@ import SwiftUI
 import AVKit
 
 public struct SwiftyVideoView: View {
+	let controller: AVPlayerController
 	let player: AVPlayer
 	var aspectRatio: AVLayerVideoGravity
 
-	public typealias Action = (AVPlayer) -> Void
+	public typealias Action = (AVPlayerController) -> Void
 
 	let singleTapAction: Action
 	let doubleTapAction: Action
 
 	public init(
-		player: AVPlayer,
+		controller: AVPlayerController,
 		aspectRatio: AVLayerVideoGravity = .resizeAspect,
 		singleTapAction: @escaping Action = { _ in },
 		doubleTapAction: @escaping Action = { _ in }) {
 
-		self.player = player
+		self.controller = controller
+		self.player = controller.player
 		self.aspectRatio = aspectRatio
 		self.singleTapAction = singleTapAction
 		self.doubleTapAction = doubleTapAction
@@ -32,18 +34,35 @@ public struct SwiftyVideoView: View {
     public var body: some View {
 		VideoWrapper(player: player, gravity: aspectRatio)
 			.onTapGesture(count: 2, perform: {
-				doubleTapAction(player)
+				doubleTapAction(controller)
 			})
 			.onTapGesture(perform: {
-				singleTapAction(player)
+				singleTapAction(controller)
 			})
+	}
+
+	public func onSingleTapAction(_ perform: @escaping Action) -> SwiftyVideoView {
+		let action = { (avPlayerController: AVPlayerController) in
+			singleTapAction(avPlayerController)
+			perform(avPlayerController)
+		}
+		return SwiftyVideoView(controller: controller, aspectRatio: aspectRatio, singleTapAction: action, doubleTapAction: doubleTapAction)
+	}
+
+	public func onDoubleTapAction(_ perform: @escaping Action) -> SwiftyVideoView {
+		let action = { (avPlayerController: AVPlayerController) in
+			doubleTapAction(avPlayerController)
+			perform(avPlayerController)
+		}
+		return SwiftyVideoView(controller: controller, aspectRatio: aspectRatio, singleTapAction: singleTapAction, doubleTapAction: action)
 	}
 }
 
 struct SwiftyVideoView_Previews: PreviewProvider {
     static var previews: some View {
 		let player = AVPlayer(url: URL(fileURLWithPath: "/Users/mredig/Downloads/VID_20200603_103616.mp4"))
-		SwiftyVideoView(player: player, singleTapAction: { player in
+		let controller = AVPlayerController(player: player)
+		SwiftyVideoView(controller: controller, singleTapAction: { player in
 			player.isPlaying ? player.pause() : player.play()
 		}, doubleTapAction: { player in
 			print("double tapped")
