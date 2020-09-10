@@ -21,13 +21,22 @@ class UIKVideoView: UIView {
 
 	private let playerLayer: AVPlayerLayer
 
+	var observers: Set<NSKeyValueObservation> = []
+
 	init(player: AVPlayer, gravity: AVLayerVideoGravity = .resizeAspect) {
 		self.player = player
 		self.playerLayer = AVPlayerLayer(player: player)
 		super.init(frame: .zero)
 		self.gravity = gravity
 
-		layer.addSublayer(playerLayer)
+		let readyOb = playerLayer.observe(\.isReadyForDisplay) { [weak self] (player, change) in
+			self?.attachLayer()
+		}
+		observers.insert(readyOb)
+	}
+
+	deinit {
+		observers.forEach { $0.invalidate() }
 	}
 
 	required init?(coder: NSCoder) {
@@ -36,6 +45,12 @@ class UIKVideoView: UIView {
 
 	override func layoutSubviews() {
 		super.layoutSubviews()
-		playerLayer.frame = bounds
+		let rect = bounds
+		playerLayer.frame = rect
+	}
+
+	private func attachLayer() {
+		guard playerLayer.superlayer == nil else { return }
+		layer.addSublayer(playerLayer)
 	}
 }

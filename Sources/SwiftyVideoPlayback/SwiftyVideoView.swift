@@ -11,50 +11,45 @@ import AVKit
 public struct SwiftyVideoView: View {
 	let controller: AVPlayerController
 	let player: AVPlayer
-	var aspectRatio: AVLayerVideoGravity
+	var gravity: AVLayerVideoGravity = .resizeAspect
 
 	public typealias Action = (AVPlayerController) -> Void
 
-	let singleTapAction: Action
-	let doubleTapAction: Action
+	var singleTapActions: [Action] = []
+	var doubleTapActions: [Action] = []
 
-	public init(
-		controller: AVPlayerController,
-		aspectRatio: AVLayerVideoGravity = .resizeAspect,
-		singleTapAction: @escaping Action = { _ in },
-		doubleTapAction: @escaping Action = { _ in }) {
+	public init(controller: AVPlayerController) {
 
 		self.controller = controller
 		self.player = controller.player
-		self.aspectRatio = aspectRatio
-		self.singleTapAction = singleTapAction
-		self.doubleTapAction = doubleTapAction
 	}
 
     public var body: some View {
-		VideoWrapper(player: player, gravity: aspectRatio)
+		VideoWrapper(player: player, gravity: gravity)
 			.onTapGesture(count: 2, perform: {
-				doubleTapAction(controller)
+				doubleTapActions.forEach { $0(controller) }
 			})
 			.onTapGesture(perform: {
-				singleTapAction(controller)
+				singleTapActions.forEach { $0(controller) }
 			})
 	}
 
 	public func onSingleTapAction(_ perform: @escaping Action) -> SwiftyVideoView {
-		let action = { (avPlayerController: AVPlayerController) in
-			singleTapAction(avPlayerController)
-			perform(avPlayerController)
-		}
-		return SwiftyVideoView(controller: controller, aspectRatio: aspectRatio, singleTapAction: action, doubleTapAction: doubleTapAction)
+		var newView = self
+		newView.singleTapActions.append(perform)
+		return newView
 	}
 
 	public func onDoubleTapAction(_ perform: @escaping Action) -> SwiftyVideoView {
-		let action = { (avPlayerController: AVPlayerController) in
-			doubleTapAction(avPlayerController)
-			perform(avPlayerController)
-		}
-		return SwiftyVideoView(controller: controller, aspectRatio: aspectRatio, singleTapAction: singleTapAction, doubleTapAction: action)
+		var newView = self
+		newView.doubleTapActions.append(perform)
+		return newView
+	}
+
+	public func layerGravity(_ gravity: AVLayerVideoGravity) -> SwiftyVideoView {
+		var newValue = self
+		newValue.gravity = gravity
+		return newValue
 	}
 }
 
@@ -62,11 +57,10 @@ struct SwiftyVideoView_Previews: PreviewProvider {
     static var previews: some View {
 		let player = AVPlayer(url: URL(fileURLWithPath: "/Users/mredig/Downloads/VID_20200603_103616.mp4"))
 		let controller = AVPlayerController(player: player)
-		SwiftyVideoView(controller: controller, singleTapAction: { player in
-			player.isPlaying ? player.pause() : player.play()
-		}, doubleTapAction: { player in
-			print("double tapped")
-		})
+		SwiftyVideoView(controller: controller)
+			.onSingleTapAction({ (controller) in
+				controller.isPlaying ? controller.pause() : controller.play()
+			})
 		.ignoresSafeArea()
 		.onAppear(perform: {
 			player.play()
