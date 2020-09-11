@@ -17,6 +17,8 @@ public struct SwiftyVideoView: View {
 
 	var singleTapActions: [Action] = []
 	var doubleTapActions: [Action] = []
+	var appearActions: [Action] = []
+	var disappearActions: [Action] = []
 
 	public init(controller: AVPlayerController) {
 
@@ -31,6 +33,12 @@ public struct SwiftyVideoView: View {
 			})
 			.onTapGesture(perform: {
 				singleTapActions.forEach { $0(controller) }
+			})
+			.onAppear(perform: {
+				appearActions.forEach { $0(controller) }
+			})
+			.onDisappear(perform: {
+				disappearActions.forEach { $0(controller) }
 			})
 	}
 
@@ -49,6 +57,18 @@ public struct SwiftyVideoView: View {
 	public func layerGravity(_ gravity: AVLayerVideoGravity) -> SwiftyVideoView {
 		var newValue = self
 		newValue.gravity = gravity
+		return newValue
+	}
+
+	public func onAppear(_ perform: @escaping Action) -> SwiftyVideoView {
+		var newValue = self
+		newValue.appearActions.append(perform)
+		return newValue
+	}
+
+	public func onDisappear(_ perform: @escaping Action) -> SwiftyVideoView {
+		var newValue = self
+		newValue.disappearActions.append(perform)
 		return newValue
 	}
 }
