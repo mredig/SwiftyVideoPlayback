@@ -10,6 +10,18 @@ public class AVPlayerController {
 
 	public var shouldLoop = false
 
+	public var currentSeconds: TimeInterval {
+		player.currentTime().seconds
+	}
+
+	public var currentTime: CMTime {
+		player.currentTime()
+	}
+
+	public var currentPosition: Double {
+		player.currentTime().seconds / (player.currentItem?.duration.seconds ?? 1)
+	}
+
 	private var loopMinder: NSObjectProtocol?
 
 	public init(player: AVPlayer, withAudio: Bool = true) {
@@ -59,7 +71,7 @@ public class AVPlayerController {
 	}
 
 	/// positive for forward, negative for backward
-	public func skip(time: TimeInterval) {
+	public func skip(relativeSeconds time: TimeInterval) {
 		let currentTime = player.currentTime().seconds
 		let newTime = currentTime + time
 
@@ -73,6 +85,28 @@ public class AVPlayerController {
 		} else {
 			player.seek(to: .init(seconds: newTime, preferredTimescale: 600))
 		}
+	}
+
+	public func skip(toPosition position: TimeInterval) {
+		var position = position
+		if position < 0 {
+			position = 0
+		} else if position > 1 {
+			position = 1
+		}
+
+		let cmDuration = player.currentItem?.duration ?? .zero
+		let duration = cmDuration.seconds
+
+		player.seek(to: .init(seconds: duration * position, preferredTimescale: 600))
+	}
+
+	public func skip(toTime time: CMTime) {
+		player.seek(to: time)
+	}
+
+	public func skip(toTime time: TimeInterval) {
+		skip(toTime: .init(seconds: time, preferredTimescale: 600))
 	}
 
 
