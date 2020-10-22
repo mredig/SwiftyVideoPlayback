@@ -2,8 +2,8 @@ import SwiftUI
 import AVKit
 
 public struct SwiftyVideoView: View {
-	let controller: AVPlayerController
-	var gravity: AVLayerVideoGravity = .resizeAspect
+	public let controller: AVPlayerController
+	public var gravity: AVLayerVideoGravity = .resizeAspect
 
     public var body: some View {
 		VideoWrapper(controller: controller, gravity: gravity)
