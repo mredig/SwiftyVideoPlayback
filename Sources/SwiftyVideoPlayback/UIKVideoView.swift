@@ -1,10 +1,3 @@
-//
-//  UIKVideoView.swift
-//  UIKit Video
-//
-//  Created by Michael Redig on 9/9/20.
-//
-
 import UIKit
 import AVKit
 
