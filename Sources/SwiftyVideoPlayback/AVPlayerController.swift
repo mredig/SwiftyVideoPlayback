@@ -5,7 +5,6 @@ public class AVPlayerController {
 		player.isPlaying
 	}
 
-
 	public let player: AVPlayer
 
 	public var shouldLoop = false
@@ -23,6 +22,8 @@ public class AVPlayerController {
 	}
 
 	private var loopMinder: NSObjectProtocol?
+
+	private var updateCallbacks: [(AVPlayerController) -> Void] = []
 
 	public init(player: AVPlayer, withAudio: Bool = true) {
 		self.player = player
@@ -58,16 +59,18 @@ public class AVPlayerController {
 
 	public func play() {
 		player.play()
-//		scheduleRepeat()
+		executeUpdateCallbacks()
 	}
 
 	public func pause() {
 		player.pause()
+		executeUpdateCallbacks()
 	}
 
 	public func stop() {
 		player.pause()
 		player.seek(to: .zero)
+		executeUpdateCallbacks()
 	}
 
 	/// positive for forward, negative for backward
@@ -85,6 +88,7 @@ public class AVPlayerController {
 		} else {
 			player.seek(to: .init(seconds: newTime, preferredTimescale: 600))
 		}
+		executeUpdateCallbacks()
 	}
 
 	public func skip(toPosition position: TimeInterval) {
@@ -99,36 +103,23 @@ public class AVPlayerController {
 		let duration = cmDuration.seconds
 
 		player.seek(to: .init(seconds: duration * position, preferredTimescale: 600))
+		executeUpdateCallbacks()
 	}
 
 	public func skip(toTime time: CMTime) {
 		player.seek(to: time)
+		executeUpdateCallbacks()
 	}
 
 	public func skip(toTime time: TimeInterval) {
 		skip(toTime: .init(seconds: time, preferredTimescale: 600))
 	}
 
+	public func addUpdateCallback(_ perform: @escaping (AVPlayerController) -> Void) {
+		updateCallbacks.append(perform)
+	}
 
-//	private func scheduleRepeat() {
-//		let currentTime = player.currentTime()
-//		let duration = player.currentItem?.duration ?? .zero
-//
-//		let remaining = duration - currentTime
-//
-//		let slop = 0.05
-//
-//		if remaining.seconds > slop {
-//			DispatchQueue.main.asyncAfter(deadline: .now() + remaining.seconds - slop) { [weak self] in
-//				self?.scheduleRepeat()
-//			}
-//		} else {
-//			let timer = Timer.scheduledTimer(withTimeInterval: remaining.seconds, repeats: false) { [weak self] timer in
-//				guard self?.shouldLoop == true else { return }
-//				self?.player.seek(to: .zero, completionHandler: { success in
-//					self?.play()
-//				})
-//			}
-//		}
-//	}
+	private func executeUpdateCallbacks() {
+		updateCallbacks.forEach { $0(self) }
+	}
 }

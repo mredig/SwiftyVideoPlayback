@@ -49,6 +49,14 @@ public class SwiftyUIKVideoView: UIView {
 	private func commonInit() {
 		setupControlLayer()
 		setupGesture()
+
+		playerController.addUpdateCallback { [weak self] playerController in
+			if playerController.isPlaying {
+				self?.hideControls()
+			} else {
+				self?.showControls()
+			}
+		}
 	}
 
 	private func setupControlLayer() {
