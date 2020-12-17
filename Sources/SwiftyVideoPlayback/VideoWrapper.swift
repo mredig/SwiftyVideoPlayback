@@ -6,11 +6,11 @@ struct VideoWrapper: UIViewRepresentable {
 	let controller: AVPlayerController
 	var gravity: AVLayerVideoGravity = .resizeAspect
 
-	func makeUIView(context: Context) -> UIKVideoView {
+	func makeUIView(context: Context) -> SwiftyUIKVideoView {
 		context.coordinator.videoView
 	}
 
-	func updateUIView(_ videoView: UIKVideoView, context: Context) {
+	func updateUIView(_ videoView: SwiftyUIKVideoView, context: Context) {
 		videoView.gravity = gravity
 	}
 
@@ -19,7 +19,7 @@ struct VideoWrapper: UIViewRepresentable {
 	}
 
 	class Coordinator {
-		let videoView: UIKVideoView
+		let videoView: SwiftyUIKVideoView
 		let controller: AVPlayerController
 		var gravity: AVLayerVideoGravity {
 			get { videoView.gravity }
@@ -28,14 +28,14 @@ struct VideoWrapper: UIViewRepresentable {
 
 		init(controller: AVPlayerController, gravity: AVLayerVideoGravity) {
 			self.controller = controller
-			self.videoView = UIKVideoView(player: controller.player, gravity: gravity)
+			self.videoView = SwiftyUIKVideoView(player: controller.player, gravity: gravity)
 		}
 	}
 }
 
 struct VideoPlayback_Previews: PreviewProvider {
 	static var previews: some View {
-		let player = AVPlayer(url: URL(fileURLWithPath: "/Users/mredig/Downloads/VID_20200603_103616.mp4"))
+		let player = AVPlayer(url: URL(string: "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_adv_example_hevc/master.m3u8")!)
 
 		let controller = AVPlayerController(player: player)
 		Group {
@@ -43,7 +43,6 @@ struct VideoPlayback_Previews: PreviewProvider {
 				.ignoresSafeArea()
 				.onAppear(perform: {
 					controller.play()
-					print("fart")
 			})
 
 			VideoWrapper(controller: controller)
@@ -51,7 +50,6 @@ struct VideoPlayback_Previews: PreviewProvider {
 				.ignoresSafeArea()
 				.onAppear(perform: {
 					controller.play()
-					print("fart")
 				})
 		}
 	}

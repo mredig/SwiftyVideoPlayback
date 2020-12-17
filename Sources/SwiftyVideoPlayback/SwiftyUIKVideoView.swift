@@ -1,9 +1,9 @@
 import UIKit
 import AVKit
 
-class UIKVideoView: UIView {
-	var player: AVPlayer
-	var gravity: AVLayerVideoGravity {
+public class SwiftyUIKVideoView: UIView {
+	public var player: AVPlayer
+	public var gravity: AVLayerVideoGravity {
 		get {
 			playerLayer.videoGravity
 		}
@@ -16,13 +16,14 @@ class UIKVideoView: UIView {
 
 	var observers: Set<NSKeyValueObservation> = []
 
-	init(player: AVPlayer, gravity: AVLayerVideoGravity = .resizeAspect) {
+	public init(player: AVPlayer, gravity: AVLayerVideoGravity = .resizeAspect) {
 		self.player = player
 		self.playerLayer = AVPlayerLayer(player: player)
 		super.init(frame: .zero)
 		self.gravity = gravity
 
 		let readyOb = playerLayer.observe(\.isReadyForDisplay) { [weak self] (player, change) in
+			guard player.isReadyForDisplay else { return }
 			self?.attachLayer()
 		}
 		observers.insert(readyOb)
@@ -36,7 +37,7 @@ class UIKVideoView: UIView {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	override func layoutSubviews() {
+	public override func layoutSubviews() {
 		super.layoutSubviews()
 		let rect = bounds
 		playerLayer.frame = rect
