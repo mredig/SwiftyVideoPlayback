@@ -37,7 +37,7 @@ class IconButton: UIButton {
 
 
 	private func updateImages() {
-		let image = UIImage(systemName: icon.rawValue)//?.withTintColor(.secondarySystemBackground)
+		let image = UIImage(systemName: icon.rawValue)
 		setImage(image, for: .normal)
 		contentHorizontalAlignment = .fill
 		contentVerticalAlignment = .fill
