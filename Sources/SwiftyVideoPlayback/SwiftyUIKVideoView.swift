@@ -19,6 +19,10 @@ public class SwiftyUIKVideoView: UIView {
 	let controlLayer = UIView()
 	let playPauseButton = IconButton(icon: .playPauseFill)
 
+	public var controlsEnabled = true {
+		didSet { updateUserControlSetting() }
+	}
+
 	public init(playerController: AVPlayerController, gravity: AVLayerVideoGravity = .resizeAspect) {
 		self.playerController = playerController
 		self.playerLayer = AVPlayerLayer(player: playerController.player)
@@ -44,7 +48,7 @@ public class SwiftyUIKVideoView: UIView {
 
 	private func commonInit() {
 		setupControlLayer()
-
+		setupGesture()
 	}
 
 	private func setupControlLayer() {
@@ -80,6 +84,11 @@ public class SwiftyUIKVideoView: UIView {
 		playPauseButton.addTarget(self, action: #selector(playPauseButtonPressed), for: .touchUpInside)
 	}
 
+	private func setupGesture() {
+		let tapGesture = UITapGestureRecognizer(target: self, action: #selector(videoTapped))
+		addGestureRecognizer(tapGesture)
+	}
+
 	public override func layoutSubviews() {
 		super.layoutSubviews()
 		let rect = bounds
@@ -94,6 +103,11 @@ public class SwiftyUIKVideoView: UIView {
 
 	@objc private func playPauseButtonPressed(_ sender: IconButton) {
 		playerController.isPlaying ? playerController.pause() : playerController.play()
+		hideControls()
+	}
+
+	@objc private func videoTapped(_ sender: UITapGestureRecognizer) {
+		showControls()
 	}
 
 	private func hideControls() {
@@ -103,5 +117,17 @@ public class SwiftyUIKVideoView: UIView {
 			guard success else { return }
 			self.controlLayer.isHidden = true
 		})
+	}
+
+	private func showControls() {
+		guard controlsEnabled else { return }
+		controlLayer.alpha = 1
+		controlLayer.isHidden = false
+	}
+
+	private func updateUserControlSetting() {
+		if !controlsEnabled {
+			controlLayer.isHidden = true
+		}
 	}
 }
