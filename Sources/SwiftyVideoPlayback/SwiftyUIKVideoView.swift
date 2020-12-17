@@ -2,7 +2,7 @@ import UIKit
 import AVKit
 
 public class SwiftyUIKVideoView: UIView {
-	public var player: AVPlayer
+	public let playerController: AVPlayerController
 	public var gravity: AVLayerVideoGravity {
 		get {
 			playerLayer.videoGravity
@@ -16,9 +16,9 @@ public class SwiftyUIKVideoView: UIView {
 
 	var observers: Set<NSKeyValueObservation> = []
 
-	public init(player: AVPlayer, gravity: AVLayerVideoGravity = .resizeAspect) {
-		self.player = player
-		self.playerLayer = AVPlayerLayer(player: player)
+	public init(playerController: AVPlayerController, gravity: AVLayerVideoGravity = .resizeAspect) {
+		self.playerController = playerController
+		self.playerLayer = AVPlayerLayer(player: playerController.player)
 		super.init(frame: .zero)
 		self.gravity = gravity
 
