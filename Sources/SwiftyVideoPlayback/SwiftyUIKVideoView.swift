@@ -134,7 +134,6 @@ public class SwiftyUIKVideoView: UIView {
 		UIView.animate(withDuration: 0.5, animations: {
 			self.controlLayer.alpha = 0
 		}, completion: { success in
-			guard success else { return }
 			self.controlLayer.isHidden = true
 		})
 	}
