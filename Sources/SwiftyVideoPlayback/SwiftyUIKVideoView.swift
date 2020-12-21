@@ -1,6 +1,17 @@
 import UIKit
 import AVKit
 
+public protocol SwiftyUIKVideoViewDelegate: AnyObject {
+	func videoViewShouldShowControls(_ videoView: SwiftyUIKVideoView) -> Bool
+	func videoViewShouldHideControls(_ videoView: SwiftyUIKVideoView) -> Bool
+	func videoViewPressedPlayPauseButton(_ videoView: SwiftyUIKVideoView)
+}
+
+public extension SwiftyUIKVideoViewDelegate {
+	func videoViewShouldShowControls(_ videoView: SwiftyUIKVideoView) -> Bool { true }
+	func videoViewShouldHideControls(_ videoView: SwiftyUIKVideoView) -> Bool { true }
+}
+
 public class SwiftyUIKVideoView: UIView {
 	public let playerController: AVPlayerController
 	public var gravity: AVLayerVideoGravity {
@@ -19,9 +30,7 @@ public class SwiftyUIKVideoView: UIView {
 	let controlLayer = UIView()
 	let playPauseButton = IconButton(icon: .playPauseFill)
 
-	public var controlsEnabled = true {
-		didSet { updateUserControlSetting() }
-	}
+	public weak var delegate: SwiftyUIKVideoViewDelegate?
 
 	public init(playerController: AVPlayerController, gravity: AVLayerVideoGravity = .resizeAspect) {
 		self.playerController = playerController
@@ -110,15 +119,15 @@ public class SwiftyUIKVideoView: UIView {
 	}
 
 	@objc private func playPauseButtonPressed(_ sender: IconButton) {
-		playerController.isPlaying ? playerController.pause() : playerController.play()
-		hideControls()
+		delegate?.videoViewPressedPlayPauseButton(self)
 	}
 
 	@objc private func videoTapped(_ sender: UITapGestureRecognizer) {
 		showControls()
 	}
 
-	private func hideControls() {
+	func hideControls() {
+		guard delegate?.videoViewShouldHideControls(self) ?? true else { return }
 		UIView.animate(withDuration: 0.5, animations: {
 			self.controlLayer.alpha = 0
 		}, completion: { success in
@@ -127,15 +136,9 @@ public class SwiftyUIKVideoView: UIView {
 		})
 	}
 
-	private func showControls() {
-		guard controlsEnabled else { return }
+	func showControls() {
+		guard delegate?.videoViewShouldShowControls(self) ?? true else { return }
 		controlLayer.alpha = 1
 		controlLayer.isHidden = false
-	}
-
-	private func updateUserControlSetting() {
-		if !controlsEnabled {
-			controlLayer.isHidden = true
-		}
 	}
 }

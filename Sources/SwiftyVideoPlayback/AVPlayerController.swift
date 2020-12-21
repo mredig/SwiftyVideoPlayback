@@ -123,3 +123,14 @@ public class AVPlayerController {
 		updateCallbacks.forEach { $0(self) }
 	}
 }
+
+extension AVPlayerController: SwiftyUIKVideoViewDelegate {
+	public func videoViewPressedPlayPauseButton(_ videoView: SwiftyUIKVideoView) {
+		isPlaying ? pause() : play()
+		videoView.hideControls()
+	}
+
+	public func videoViewShouldHideControls(_ videoView: SwiftyUIKVideoView) -> Bool {
+		isPlaying
+	}
+}
