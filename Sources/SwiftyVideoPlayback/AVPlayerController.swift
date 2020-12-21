@@ -73,7 +73,7 @@ public class AVPlayerController {
 		executeUpdateCallbacks()
 	}
 
-	/// positive for forward, negative for backward
+	/// Skips forward or backward (negative values) relative from the current position in the video.
 	public func skip(relativeSeconds time: TimeInterval) {
 		let currentTime = player.currentTime().seconds
 		let newTime = currentTime + time
@@ -91,7 +91,8 @@ public class AVPlayerController {
 		executeUpdateCallbacks()
 	}
 
-	public func skip(toPosition position: TimeInterval) {
+	/// Skip to relative position in video - 0 is the beginning, 1 is the very end.
+	public func skip(toPosition position: Double) {
 		var position = position
 		if position < 0 {
 			position = 0
@@ -106,11 +107,13 @@ public class AVPlayerController {
 		executeUpdateCallbacks()
 	}
 
+	/// Skip to the nearest absolute CMTime resolution in the video
 	public func skip(toTime time: CMTime) {
 		player.seek(to: time)
 		executeUpdateCallbacks()
 	}
 
+	/// Converts `time` to CMTime and skips to the requested absolute time in the video.
 	public func skip(toTime time: TimeInterval) {
 		skip(toTime: .init(seconds: time, preferredTimescale: 600))
 	}
