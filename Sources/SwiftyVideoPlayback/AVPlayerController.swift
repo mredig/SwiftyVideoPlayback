@@ -25,6 +25,8 @@ public class AVPlayerController {
 
 	private var updateCallbacks: [(AVPlayerController) -> Void] = []
 
+	public var canHideControlsWhilePaused = true
+
 	public init(player: AVPlayer, withAudio: Bool = true) {
 		self.player = player
 
@@ -135,6 +137,6 @@ extension AVPlayerController: SwiftyUIKVideoViewDelegate {
 	}
 
 	public func videoViewShouldHideControls(_ videoView: SwiftyUIKVideoView) -> Bool {
-		isPlaying
+		isPlaying || canHideControlsWhilePaused
 	}
 }
