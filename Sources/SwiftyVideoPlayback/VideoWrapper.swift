@@ -28,7 +28,7 @@ struct VideoWrapper: UIViewRepresentable {
 
 		init(controller: AVPlayerController, gravity: AVLayerVideoGravity) {
 			self.controller = controller
-			self.videoView = SwiftyUIKVideoView(playerController: controller, gravity: gravity)
+			self.videoView = SwiftyUIKVideoView(player: controller.player, gravity: gravity)
 		}
 	}
 }

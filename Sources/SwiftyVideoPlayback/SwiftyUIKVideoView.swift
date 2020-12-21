@@ -13,7 +13,7 @@ public extension SwiftyUIKVideoViewDelegate {
 }
 
 public class SwiftyUIKVideoView: UIView {
-	public let playerController: AVPlayerController
+	public let player: AVPlayer
 	public var gravity: AVLayerVideoGravity {
 		get {
 			playerLayer.videoGravity
@@ -34,9 +34,9 @@ public class SwiftyUIKVideoView: UIView {
 
 	private var controlHidingTimer: Timer?
 
-	public init(playerController: AVPlayerController, gravity: AVLayerVideoGravity = .resizeAspect) {
-		self.playerController = playerController
-		self.playerLayer = AVPlayerLayer(player: playerController.player)
+	public init(player: AVPlayer, gravity: AVLayerVideoGravity = .resizeAspect) {
+		self.player = player
+		self.playerLayer = AVPlayerLayer(player: player)
 		super.init(frame: .zero)
 		self.gravity = gravity
 
@@ -60,14 +60,6 @@ public class SwiftyUIKVideoView: UIView {
 	private func commonInit() {
 		setupControlLayer()
 		setupGesture()
-
-		playerController.addUpdateCallback { [weak self] playerController in
-			if playerController.isPlaying {
-				self?.hideControls()
-			} else {
-				self?.showControls()
-			}
-		}
 	}
 
 	private func setupControlLayer() {
@@ -137,7 +129,7 @@ public class SwiftyUIKVideoView: UIView {
 		}
 	}
 
-	func hideControls() {
+	public func hideControls() {
 		guard delegate?.videoViewShouldHideControls(self) ?? true else { return }
 		UIView.animate(withDuration: 0.5, animations: {
 			self.controlLayer.alpha = 0
@@ -147,7 +139,7 @@ public class SwiftyUIKVideoView: UIView {
 		})
 	}
 
-	func showControls() {
+	public func showControls() {
 		guard delegate?.videoViewShouldShowControls(self) ?? true else { return }
 		controlLayer.alpha = 1
 		controlLayer.isHidden = false
