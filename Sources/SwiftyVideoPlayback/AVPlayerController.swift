@@ -43,6 +43,7 @@ public class AVPlayerController {
 					if let notifyingPlayerItem = notification.object as? AVPlayerItem {
 						if notifyingPlayerItem == self.player.currentItem {
 							self.player.seek(to: .zero)
+							self.executeUpdateCallbacks()
 							if self.shouldLoop {
 								self.play()
 							}
