@@ -32,6 +32,8 @@ public class SwiftyUIKVideoView: UIView {
 
 	public weak var delegate: SwiftyUIKVideoViewDelegate?
 
+	private var controlHidingTimer: Timer?
+
 	public init(playerController: AVPlayerController, gravity: AVLayerVideoGravity = .resizeAspect) {
 		self.playerController = playerController
 		self.playerLayer = AVPlayerLayer(player: playerController.player)
@@ -123,7 +125,16 @@ public class SwiftyUIKVideoView: UIView {
 	}
 
 	@objc private func videoTapped(_ sender: UITapGestureRecognizer) {
-		showControls()
+		if controlLayer.isHidden {
+			showControls()
+			controlHidingTimer?.invalidate()
+			controlHidingTimer = .scheduledTimer(withTimeInterval: 3, repeats: false, block: { [weak self] timer in
+				self?.hideControls()
+				timer.invalidate()
+			})
+		} else {
+			hideControls()
+		}
 	}
 
 	func hideControls() {
