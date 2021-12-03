@@ -71,7 +71,7 @@ public class AVPlayerController {
 		   }
 	   }
 
-	public func play(withCategory category: AVAudioSession.Category? = nil) {
+	public func play(withCategory category: AVAudioSession.Category? = .ambient) {
 		if let category = category {
 			config(category: category)
 		}
