@@ -5,6 +5,8 @@ public class AVPlayerController {
 		player.isPlaying
 	}
 
+	private let session = AVAudioSession.sharedInstance()
+
 	public let player: AVPlayer
 
 	public var shouldLoop = false
@@ -60,7 +62,20 @@ public class AVPlayerController {
 		stop()
 	}
 
-	public func play() {
+
+	private func config(category: AVAudioSession.Category) {
+		   do {
+			   try session.setCategory(category, mode: .moviePlayback, options: [])
+		   } catch {
+			   print("Error configuring av audio session: \(error) (\(error.localizedDescription))")
+		   }
+	   }
+
+	public func play(withCategory category: AVAudioSession.Category? = nil) {
+		if let category = category {
+			config(category: category)
+		}
+
 		player.play()
 		executeUpdateCallbacks()
 	}
