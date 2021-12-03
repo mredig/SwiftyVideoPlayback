@@ -147,7 +147,7 @@ public class AVPlayerController {
 
 extension AVPlayerController: SwiftyUIKVideoViewDelegate {
 	public func videoViewPressedPlayPauseButton(_ videoView: SwiftyUIKVideoView) {
-		isPlaying ? pause() : play()
+		isPlaying ? pause() : play(withCategory: .playback)
 		videoView.hideControls()
 	}
 
