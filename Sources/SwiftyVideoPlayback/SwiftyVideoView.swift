@@ -1,49 +1,18 @@
-//
-//  SwiftUIView 2.swift
-//  
-//
-//  Created by Michael Redig on 9/9/20.
-//
-
 import SwiftUI
 import AVKit
 
 public struct SwiftyVideoView: View {
-	let controller: AVPlayerController
-	let player: AVPlayer
-	var gravity: AVLayerVideoGravity = .resizeAspect
 
-	public typealias Action = (AVPlayerController) -> Void
+	public let controller: AVPlayerController
+	public var gravity: AVLayerVideoGravity
 
-	var singleTapActions: [Action] = []
-	var doubleTapActions: [Action] = []
-
-	public init(controller: AVPlayerController) {
-
+	public init(controller: AVPlayerController, gravity: AVLayerVideoGravity = .resizeAspect) {
 		self.controller = controller
-		self.player = controller.player
+		self.gravity = gravity
 	}
 
-    public var body: some View {
-		VideoWrapper(player: player, gravity: gravity)
-			.onTapGesture(count: 2, perform: {
-				doubleTapActions.forEach { $0(controller) }
-			})
-			.onTapGesture(perform: {
-				singleTapActions.forEach { $0(controller) }
-			})
-	}
-
-	public func onSingleTapAction(_ perform: @escaping Action) -> SwiftyVideoView {
-		var newView = self
-		newView.singleTapActions.append(perform)
-		return newView
-	}
-
-	public func onDoubleTapAction(_ perform: @escaping Action) -> SwiftyVideoView {
-		var newView = self
-		newView.doubleTapActions.append(perform)
-		return newView
+	public var body: some View {
+		VideoWrapper(controller: controller, gravity: gravity)
 	}
 
 	public func layerGravity(_ gravity: AVLayerVideoGravity) -> SwiftyVideoView {
@@ -55,15 +24,13 @@ public struct SwiftyVideoView: View {
 
 struct SwiftyVideoView_Previews: PreviewProvider {
     static var previews: some View {
-		let player = AVPlayer(url: URL(fileURLWithPath: "/Users/mredig/Downloads/VID_20200603_103616.mp4"))
+		let player = AVPlayer(url: URL(string: "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_adv_example_hevc/master.m3u8")!)
 		let controller = AVPlayerController(player: player)
 		SwiftyVideoView(controller: controller)
-			.onSingleTapAction({ (controller) in
-				controller.isPlaying ? controller.pause() : controller.play()
+			.layerGravity(.resizeAspectFill)
+			.ignoresSafeArea()
+			.onAppear(perform: {
+				controller.play()
 			})
-		.ignoresSafeArea()
-		.onAppear(perform: {
-			player.play()
-		})
-    }
+	}
 }
